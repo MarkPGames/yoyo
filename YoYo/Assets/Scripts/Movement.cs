@@ -14,8 +14,6 @@ public class Movement : MonoBehaviour
     // Determines if 'yoyo' is in the expand or the shrink state
     private YoyoState mYoyoState;
 
-    // Determines if mouse or tap was pressed
-    private bool pressed = false;
     //The red circle's position
     [SerializeField]
     private Vector2 anchorPos = Vector2.zero;
@@ -35,7 +33,7 @@ public class Movement : MonoBehaviour
     void Update()
     {
         // current distance from anchor
-        float currDist = Vector2.Distance(anchorPos, this.transform.position);
+        float currDist = Vector2.Distance(anchorPos, _transform.position);
 
         if (Input.GetMouseButton(0))
         {
