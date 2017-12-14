@@ -2,67 +2,76 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour {
+public enum YoyoState
+{
+    IDLE,
+    EXPANDING,
+    SHRINKING,
+}
 
+public class Movement : MonoBehaviour
+{
     // Determines if 'yoyo' is in the expand or the shrink state
-    bool expand;
-    bool shrink;
-    // Determines if mouse or tap was pressed
-    bool pressed;
-    //The red circle's position
-    Vector2 anchorPos;
+    private YoyoState mYoyoState;
 
+    // Determines if mouse or tap was pressed
+    private bool pressed = false;
+    //The red circle's position
+    [SerializeField]
+    private Vector2 anchorPos = Vector2.zero;
+    [SerializeField]
+    private float minDistance = 1.0f;
+    [SerializeField]
+    private float maxDistance = 2.5f;
+
+    Transform _transform;
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-        expand = false;
-        shrink = true;
-        pressed = false;
-        anchorPos = new Vector3(0f,0f,0f);
+        _transform = this.transform;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         // current distance from anchor
-        float currDist = Vector2.Distance(anchorPos, transform.position);
-        
-        if (Input.GetMouseButtonDown(0))
+        float currDist = Vector2.Distance(anchorPos, this.transform.position);
+
+        if (Input.GetMouseButton(0))
         {
-            pressed = true;
+            mYoyoState = YoyoState.EXPANDING;
         }
-
-        if (pressed == true)
+        else
         {
-            if (shrink == true && pressed == true)
-            {
-                if (currDist <= 2.5f)
+            mYoyoState = YoyoState.SHRINKING;
+        }
+        //simple finite state machine
+        switch (mYoyoState)
+        {
+            case YoyoState.IDLE:
                 {
-                    transform.position = Vector2.MoveTowards(transform.position, (transform.position * (2.5f / currDist)), 0.8f * Time.deltaTime);
+                    break;
                 }
-                else
+            case YoyoState.EXPANDING:
                 {
-                    pressed = false;
-                    shrink = false;
-                    expand = true;
+                    if (currDist <= maxDistance)
+                    {
+                        _transform.position = Vector2.MoveTowards(_transform.position, (_transform.position * (maxDistance / currDist)), 0.8f * Time.deltaTime);
+                    }
+                    break;
                 }
-            }
-           // if (expand == true && pressed == true)
-           // {
-           //     if (currDist >= 2.5f)
-           //     {
-           //         transform.position = Vector2.MoveTowards(transform.position, (transform.position / (2.5f / currDist)), 0.8f * Time.deltaTime);
-           //     }
-           //     else
-           //     {
-           //         pressed = false;
-           //         shrink = true;
-           //         expand = false;
-           //     }
-           // }
-        }  //
-
-
-
+            case YoyoState.SHRINKING:
+                {
+                    if (currDist >= minDistance)
+                    {
+                        _transform.position = Vector2.MoveTowards(_transform.position, (_transform.position * (-maxDistance / currDist)), 0.8f * Time.deltaTime);
+                    }
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
     }
 }
