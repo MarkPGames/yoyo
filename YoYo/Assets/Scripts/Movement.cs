@@ -21,12 +21,14 @@ public class Movement : MonoBehaviour
     private float minDistance = 1.0f;
     [SerializeField]
     private float maxDistance = 2.5f;
+    LineRenderer line;
 
     Transform _transform;
     // Use this for initialization
     void Start()
     {
         _transform = this.transform;
+        line = GetComponent<LineRenderer>();
     }
 
     // Update is called once per frame
@@ -71,5 +73,7 @@ public class Movement : MonoBehaviour
                     break;
                 }
         }
+
+        line.SetPosition(1, transform.position);
     }
 }
